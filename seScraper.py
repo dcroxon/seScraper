@@ -51,20 +51,20 @@ startUrl = 'https://standardebooks.org/ebooks/'
 
 # Create download directory
 if len(sys.argv) < 2:
-    print('Created download directory: %s' % os.path.join(os.getcwd(), 'standardEbooks'))
+    print('Downloading eBooks to: %s' % os.path.join(os.getcwd(), 'standardEbooks'))
     os.makedirs('standardEbooks', exist_ok=True)
     os.chdir('standardEbooks')
 elif len(sys.argv) == 2:
     newDir = os.path.join(sys.argv[1], 'standardEbooks')
+    print('Downloading eBooks to: %s' % newDir)
     if os.path.exists(newDir):
         os.chdir(newDir)
     else:
         try:
-            print('Created download directory: %s' % newDir)
             os.makedirs(newDir, exist_ok=True)
             os.chdir(newDir)
         except OSError:
-            print('Cannot create path %s. Please input a valid path.' % newDir)
+            print('Cannot download to: %s. Please input a valid path.' % newDir)
             print('Usage: python seScraper.py <path> - set download directory')
             sys.exit()
 else:
