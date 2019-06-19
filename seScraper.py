@@ -1,7 +1,7 @@
-#! python3
-# seScraper.py - Web scraper that downloads all ebook formats and covers from Standard eBooks
+#! /usr/bin/python3
+# seScraper.py - A web scraper which downloads all ebook files from www.standardebooks.org
 
-import os, requests, bs4
+import os, sys, requests, bs4
 
 
 def bookDownload(bookUrl, siteUrl):
@@ -43,15 +43,33 @@ def bookDownload(bookUrl, siteUrl):
         for chunk in dlResponse.iter_content(100000):
             ebFile.write(chunk)
         ebFile.close()
-        print('Download of %s complete' % os.path.basename(eBookFile))
+        print('Download complete: %s' % os.path.basename(eBookFile))
 
 # Define base and start URLs
 baseUrl = 'https://standardebooks.org'
 startUrl = 'https://standardebooks.org/ebooks/'
 
-# Create working directory
-os.makedirs('standardEbooks', exist_ok=True)
-os.chdir('standardEbooks')
+# Create download directory
+if len(sys.argv) < 2:
+    print('Created download directory: %s' % os.path.join(os.getcwd(), 'standardEbooks'))
+    os.makedirs('standardEbooks', exist_ok=True)
+    os.chdir('standardEbooks')
+elif len(sys.argv) == 2:
+    newDir = os.path.join(sys.argv[1], 'standardEbooks')
+    if os.path.exists(newDir):
+        os.chdir(newDir)
+    else:
+        try:
+            print('Created download directory: %s' % newDir)
+            os.makedirs(newDir, exist_ok=True)
+            os.chdir(newDir)
+        except OSError:
+            print('Cannot create path %s. Please input a valid path.' % newDir)
+            print('Usage: python seScraper.py <path> - set download directory')
+            sys.exit()
+else:
+    print('Usage: python seScraper.py <path> - set download directory')
+    sys.exit()
 
 # Download first page and collect nav page URLs
 navResponse = requests.get(startUrl)
@@ -81,6 +99,7 @@ for navPage in navPages:
     # Loop through book pages and download files
     for bookUrl in bookPages:
         bookDownload(bookUrl, baseUrl)
+        print('')
 
 print('\nAll eBook files downloaded successfully!')
 
