@@ -25,25 +25,23 @@ def bookDownload(bookUrl, siteUrl):
 
     eBookFiles = [azw3Url, kepubUrl, epubUrl, epub3Url, coverUrl]
 
-    # Collect ebook details. Create eBook directory or return if it exists already
+    # Collect ebook details and create eBook directory 
     bookDetails = bookSoup.find('meta', property='og:title').get('content')
     bookDir = os.path.splitext(os.path.basename(azw3Url))[0].title()
-    if os.path.exists(bookDir):
-        print('%s has already been downloaded. Checking next book...' % bookDetails)
-        return
-    else:
-        os.makedirs(bookDir, exist_ok=True)
+    os.makedirs(bookDir, exist_ok=True)
 
     # Download ebook files
-    print('Downloading eBook files for %s...' % bookDetails)
+    print('Downloading:  %s...' % bookDetails)
     for eBookFile in eBookFiles:
-        dlResponse = requests.get(eBookFile)
-        dlResponse.raise_for_status()
-        ebFile = open(os.path.join(bookDir, os.path.basename(eBookFile)), 'wb')
-        for chunk in dlResponse.iter_content(100000):
-            ebFile.write(chunk)
-        ebFile.close()
-        print('Download complete: %s' % os.path.basename(eBookFile))
+        fileName = os.path.join(bookDir, os.path.basename(eBookFile))
+        if not os.path.exists(fileName):
+            dlResponse = requests.get(eBookFile)
+            dlResponse.raise_for_status()
+            ebFile = open(fileName, 'wb')
+            for chunk in dlResponse.iter_content(100000):
+                ebFile.write(chunk)
+            ebFile.close()
+            print('Download complete: %s' % os.path.basename(eBookFile))
 
 # Define base and start URLs
 baseUrl = 'https://standardebooks.org'
@@ -98,7 +96,6 @@ for navPage in navPages:
     # Loop through book pages and download files
     for bookUrl in bookPages:
         bookDownload(bookUrl, baseUrl)
-        print('')
 
 print('\nAll eBook files downloaded successfully!')
 
