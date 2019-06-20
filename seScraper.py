@@ -91,10 +91,9 @@ for navPage in navPages:
 
     # Collect book page URLs
     bookPages = []
-    bookSelect = cwSoup.select('.ebooks ol li p a')
-    for k in range(len(bookSelect)):
-        if k % 2 == 0:
-            bookPages.append(baseUrl + bookSelect[k].get('href'))
+    bookList = cwSoup.find('ol')
+    for li in bookList.find_all('li'):
+        bookPages.append(baseUrl + li.find('a').get('href'))
     
     # Loop through book pages and download files
     for bookUrl in bookPages:
